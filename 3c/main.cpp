@@ -5,8 +5,6 @@ const char* menu[] = {"0. Quit", "1. Input hex", "2. Output", "3. Add", "4. Subt
 int (*fptr[])(Hex::hex&) = {nullptr, input_m, output_m, add_m, subtract_m, rightshift_m, leftshift_m, checkparity_m, compare_m};
 
 int main() {
-    Hex::hex a("abcdef123456");
-    std::cout << a << "\n" << (a<<=2) << "\n" << (a>>=4) << std::endl;
     Hex::hex num;
     int ch;
     while (ch = choise(menu)) {

@@ -7,7 +7,9 @@ namespace Hex {
     hex::hex(const char* mas) {
         const char* mas1;
         len = strlen(mas);
-        sign = 0, mas1 = mas, type = 0;
+        sign = 0,
+        mas1 = mas;
+        type = 0;
         if (mas[0] == '-') {
             len--;
             mas1 = mas + 1;
@@ -15,6 +17,7 @@ namespace Hex {
         }
         if (len > 31) throw std::runtime_error("Overflow!");
         mas1 = leadzero(mas1, len);
+        letters = new char[len];
         for (int i = len - 1; i >= 0; i--) {
             if (charcheck(mas1[i])) throw std::runtime_error("Invalid input!");
             letters[len-1 - i] = (mas1[i] - 'a' + 10 < 0) ? (mas1[i]-'0') : (mas1[i] - 'a' + 10);
@@ -34,6 +37,7 @@ namespace Hex {
         if (len > 31) throw std::runtime_error("Overflow!");
         mas1 = leadzero(mas1, len);
         if (dig < len) throw std::runtime_error("Overflow!");
+        letters = new char[dig];
         for (int i = len - 1; i >= 0; i--) {
             if (charcheck(mas1[i])) throw std::runtime_error("Invalid input!");
             letters[len-1 - i] = (mas1[i] - 'a' + 10 < 0) ? (mas1[i]-'0') : (mas1[i] - 'a' + 10);
@@ -47,12 +51,22 @@ namespace Hex {
     hex::hex(int num) {
         type = 0, len = 0, sign = (num > 0) ? 0:1;
         num = abs(num);
+        char mas[31];
         do {
-            letters[len] = char(num%16);
+            mas[len] = char(num%16);
             num /= 16;
             len++;
         } while (num != 0 && len <= 31);
         if (len == 31 && num/16 > 0) throw std::runtime_error("Overflow!");
+        letters = new char[len];
+        for (int i = 0; i < len; i++) letters[i] = mas[i];
+    }
+
+    hex::hex(const hex& a): sign(a.sign), type(a.type), len(a.len), letters(nullptr) {
+        if(len) {
+            letters = new char[len];
+            for (int i = 0; i < len; i++) letters[i] = a.letters[i];
+        }
     }
 
     hex& hex::setCh(const char* a) {
@@ -177,6 +191,37 @@ namespace Hex {
         }
         this->len = i+1;
     }
+
+    hex& hex::operator =(hex && b) {
+        int len1 = len;
+        len = b.len;
+        b.len = len1;
+        int type1 = type;
+        type = b.type;
+        b.type = type1;
+        int sign1 = sign;
+        sign = b.sign;
+        b.sign = sign1;
+        char* letters1 = letters;
+        letters = b.letters;
+        b.letters = letters1;
+        return *this;
+    }
+
+    hex& hex::operator =(const hex& b) {
+        if (this != &b) {
+            delete [] letters;
+            letters = nullptr;
+            this->len = b.len;
+            this->sign = b.sign;
+            this->type = b.type;
+            if(len) {
+                letters = new char[len];
+                for (int i = 0; i < len; i++) letters[i] = b.letters[i];
+            }
+        }
+        return *this;
+    };
     
     std::ostream& operator <<(std::ostream& c, const hex& a) { //output operator overloading
         if (a.sign) c<<'-';
