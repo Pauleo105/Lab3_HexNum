@@ -9,33 +9,27 @@ namespace Hex {
             static const int SZ = 31;
             char letters[SZ+1];
             int sign; // 0 - +, 1 - -
-            int type; // 0 - прямой, 1 - дополнительный
             int len;
         public:
             hex(): sign(0), len(1) {letters[0] = '0'-'0';};
-            hex(const char*);
-            hex(const char*, int);
-            hex(int);
+            hex(const char*);//without type
+            hex(const char*, int);//without type
+            hex(int);//without type
             hex& setCh(const char*);
             hex& setNu(int);
             int getNum() const;
             const char* getStr() const;
             int getLen() const {return len;}
-            hex excode(int n, bool c = false) const;
-            hex add(const hex&) const;
-            hex subtract(const hex&) const;
-            hex& rightshift(int);
-            hex& leftshift(int);
-            int isgreat(const hex&) const;
-            bool parity() const {return ((*this).letters[0]%2 == 0) ? true : false;};
-            void leadzero1();
+            hex excode() const; //done
+            hex& expanse(int); //done
+            int isgreat(const hex&) const;//fixed
+            bool parity() const {return (int((*this).letters[0])&1) ? false : true;}; //fixed
+            hex& leadzero1(); //fixed
+            hex& operator <<=(const int&);//fixed
+            hex& operator >>=(const int&);//fixed
 
-            const hex operator +(const hex& b) {return (*this).add(b);}
-            const hex operator -(const hex& b) {return (*this).subtract(b);}
-            hex& operator <<=(const int&);
-            hex& operator >>=(const int&);
-
-
+        friend const hex operator +(const hex&, const hex&); //displaced from public
+        friend const hex operator -(const hex&, const hex&); //displaced from public
         friend std::ostream& operator <<(std::ostream&, const hex&);
         friend std::istream& operator >>(std::istream&, hex&);
     };
@@ -44,10 +38,10 @@ namespace Hex {
 
 int input_m(Hex::hex& a);
 int output_m(Hex::hex& a);
-int add_m(Hex::hex& a);
+int add_m(Hex::hex& a);//fixed
 int subtract_m(Hex::hex& a);
-int rightshift_m(Hex::hex& a);
-int leftshift_m(Hex::hex& a);
+int rightshift_m(Hex::hex& a);//fixed
+int leftshift_m(Hex::hex& a);//fixed
 int checkparity_m(Hex::hex& a);
 int compare_m(Hex::hex& a);
 

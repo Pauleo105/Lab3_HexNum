@@ -15,16 +15,16 @@ namespace Hex {
             mas1 = mas + 1;
             sign++;
         }
-        if (len > 31) throw std::runtime_error("Overflow!");
-        mas1 = leadzero(mas1, len);
+        if (len > 31) throw std::runtime_error("Overflow!"); //ограничений на 31 символ больше нет
+        mas1 = leadzero(mas1, len); //надо пропускать пробелы до знака
         letters = new char[len];
         for (int i = len - 1; i >= 0; i--) {
             if (charcheck(mas1[i])) throw std::runtime_error("Invalid input!");
-            letters[len-1 - i] = (mas1[i] - 'a' + 10 < 0) ? (mas1[i]-'0') : (mas1[i] - 'a' + 10);
+            letters[len-1 - i] = (mas1[i] - 'a' + 10 < 0) ? (mas1[i]-'0') : (mas1[i] - 'a' + 10); //лучше использовать функцию isdigit
         }
     }
 
-    hex::hex(const char* mas, int dig) {
+    hex::hex(const char* mas, int dig) {//переделать под конструктор с аргументами в виде шестнадцатиричного числа и количеством разрядов
         if (dig <= 0 || dig > 31) throw std::runtime_error("The amount of digits is [1,31]");
         const char* mas1;
         len = strlen(mas), type = 0;
@@ -35,7 +35,7 @@ namespace Hex {
             sign++;
         }
         if (len > 31) throw std::runtime_error("Overflow!");
-        mas1 = leadzero(mas1, len);
+        mas1 = leadzero(mas1, len); //пропустить перед знаками
         if (dig < len) throw std::runtime_error("Overflow!");
         letters = new char[dig];
         for (int i = len - 1; i >= 0; i--) {
@@ -49,8 +49,8 @@ namespace Hex {
     }
 
     hex::hex(int num) {
-        type = 0, len = 0, sign = (num > 0) ? 0:1;
-        num = abs(num);
+        type = 0, len = 0, sign = (num > 0) ? 0:1;//type убрать
+        num = abs(num); //создать вспомогательный массив в размере 8 байтов, и туда скопировать 16ричные числа в записи числа, в процессе копирования можно определить реальную длину числа без незначащих нулей, а затем можно просто выделить динамически память и скопировать нужные число
         char mas[31];
         do {
             mas[len] = char(num%16);
@@ -64,7 +64,7 @@ namespace Hex {
 
     hex::hex(const hex& a): sign(a.sign), type(a.type), len(a.len), letters(nullptr) {
         if(len) {
-            letters = new char[len];
+            letters = new char[len];                    //число не может быть nullptr
             for (int i = 0; i < len; i++) letters[i] = a.letters[i];
         }
     }
@@ -81,7 +81,7 @@ namespace Hex {
         return *this;
     }
 
-    int hex::getNum() const{
+    int hex::getNum() const{  //ненужный метод, убрать
         int res = 0;
         for (int i = 0; i < (*this).len; i++) res += pow(16,i)*int(letters[i]);
         return (*this).sign ? res*(-1):res;
@@ -165,7 +165,7 @@ namespace Hex {
         return (*this);
     }
 
-    int hex::isgreat(const hex& c) const {
+    int hex::isgreat(const hex& c) const { //перегрузить знаки сравнения
         hex a = *this, b = c;            
         if (a.sign < b.sign) return 1;
         else if (a.sign > b.sign) return -1;
@@ -183,7 +183,7 @@ namespace Hex {
         }
     }
 
-    void hex::leadzero1() {
+    void hex::leadzero1() { //внести перераспределение памяти, вместо метода лучше использовать инициализирующий конструктор
         int i = this->len - 1;
         while (i >= 0) {
             if (this->letters[i] == '0'-'0') i--;
@@ -237,7 +237,7 @@ namespace Hex {
         char* ptr;
         do {
             std::cout << pr;
-            pr = "Maximum 31 digits!!!\n";
+            pr = "Maximum 31 digits!!!\n"; //создать локальный массив, размер которого будет равен размеру ввода
             c >> ptr;
         } while (strlen(ptr) > 31);
         a.setCh(ptr);
@@ -257,7 +257,7 @@ namespace Hex {
 
 int charcheck(char a) { //checking the correctness of input
         int a1 = int(a - '0');
-        int b1 = int(a - 'a' + 10);
+        int b1 = int(a - 'a' + 10); //добавить проверку верхнего и нижнего регистра
         return ((a1 >= 0 && a1 <= 9) || (b1 >= 10 && b1 <= 15)) ? 0 : 1;
     }
 

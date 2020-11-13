@@ -9,26 +9,26 @@ namespace Hex {
             static const int SZ = 31;
             char letters[SZ+1];
             int sign; // 0 - +, 1 - -
-            int type; // 0 - прямой, 1 - дополнительный
             int len;
         public:
             hex(): sign(0), len(1) {letters[0] = '0'-'0';};
-            hex(const char*);
-            hex(const char*, int);
-            hex(int);
+            hex(const char*);//without type
+            hex(const char*, int);//without type
+            hex(int);//without type
             hex& setCh(const char*);
             hex& setNu(int);
             int getNum() const;
             const char* getStr() const;
             int getLen() const {return len;}
-            hex excode(int n, bool c = false) const;
-            hex add(const hex&) const;
-            hex subtract(const hex&) const;
-            hex& rightshift(const int&);
-            hex& leftshift(const int&);
-            int isgreat(const hex&) const;
-            bool parity() const {return ((*this).letters[0]%2 == 0) ? true : false;};
-            void leadzero1();
+            hex excode() const; //done
+            hex& expanse(int); //done
+            hex add(const hex&) const;//fixed
+            hex subtract(const hex&) const; //fixed
+            hex& rightshift(int); //fixed
+            hex& leftshift(int); //fixed
+            int isgreat(const hex&) const;//fixed
+            bool parity() const {return (int((*this).letters[0])&1) ? false : true;}; //fixed
+            hex& leadzero1(); //fixed
 
         friend std::ostream& operator <<(std::ostream&, const hex&);
     };

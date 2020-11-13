@@ -7,7 +7,7 @@ namespace Hex {
     hex::hex(const char* mas) {
         const char* mas1;
         len = strlen(mas);
-        sign = 0, mas1 = mas, type = 0;
+        sign = 0, mas1 = mas;
         if (mas[0] == '-') {
             len--;
             mas1 = mas + 1;
@@ -24,7 +24,7 @@ namespace Hex {
     hex::hex(const char* mas, int dig) {
         if (dig <= 0 || dig > 31) throw std::runtime_error("The amount of digits is [1,31]");
         const char* mas1;
-        len = strlen(mas), type = 0;
+        len = strlen(mas);
         sign = 0, mas1 = mas;
         if (mas[0] == '-') {
             len--;
@@ -45,7 +45,7 @@ namespace Hex {
     }
 
     hex::hex(int num) {
-        type = 0, len = 0, sign = (num > 0) ? 0:1;
+        len = 0, sign = (num > 0) ? 0:1;
         num = abs(num);
         do {
             letters[len] = char(num%16);
@@ -86,13 +86,10 @@ namespace Hex {
         return temp;
     }   
 
-    hex hex::excode(int n, bool c) const{
+    hex hex::excode() const{
         hex res = (*this);
-        if (n > 31 || n <= 0 || ((*this).len > n && !c)) throw std::runtime_error("Invalid amount of digits!");
         if (!(*this).sign) {
-            if ((*this).len <= n) {
-                for (int j = (*this).len; j < n; j++) res.letters[j] = '0'-'0';
-            }
+            return res;
         }
         else {
             int check = 1;
@@ -101,19 +98,24 @@ namespace Hex {
                 else if (check && int((*this).letters[i]) != 0) res.letters[i] = char(16)-(*this).letters[i], check--; // Difference in 16 symbols
                 else res.letters[i] = char(15)-(*this).letters[i]; // Difference in 15 symbols
             }
-            if ((*this).len < n) {
-                for (int j = (*this).len; j < n; j++) !(*this).type ? (res.letters[j] = char(15)):(res.letters[j] = '0'-'0');
-            }
         }
-        res.type = 1 - res.type;
-        res.len = n;
         return res;
+    }
+
+    hex& hex::expanse(int n) {
+        if (n > 31 || n <= 0 || ((*this).len > n)) throw std::runtime_error("Invalid amount of digits!");
+        for (int i = len; i < n; i++) letters[i] = char(0);
+        len = n;
+        return (*this);
     }
 
     hex hex::add(const hex& a) const {
         int len = (*this).len >= a.len ? (this->len):(a.len);
         char temp = '0'-'0';
-        hex a1 = a.excode(len), b1 = (*this).excode(len), c1;
+        hex a1, b1, c1;
+        a1 = a, b1 = (*this);
+        a1.expanse(len), b1.expanse(len);
+        a1 = a1.excode(),b1 = b1.excode();
         a1.letters[len] = char(a1.sign);
         b1.letters[len] = char(b1.sign);
         for (int i = 0; i <= len; i++) {
@@ -126,9 +128,9 @@ namespace Hex {
                 temp='0'-'0';
             }
         }
-        c1.len = len, c1.sign = int(c1.letters[len])%2;
+        c1.len = len, c1.sign = int(c1.letters[len])&1;
         if ((a1.sign && b1.sign && int(c1.letters[len]) == 2) || (!a1.sign && !b1.sign && int(c1.letters[len]) == 1)) throw std::runtime_error("Overflow!");
-        c1 = c1.excode(c1.len);
+        c1 = c1.excode();
         c1.leadzero1();
         return c1;
     }
@@ -139,13 +141,13 @@ namespace Hex {
         return this->add(a1);
     }
 
-    hex& hex::rightshift(const int& n){
+    hex& hex::rightshift(int n){
         for (int i = 0; i < (*this).len - n; i++) (*this).letters[i] = (*this).letters[i+n];
         for (int i = (*this).len - n; i < (*this).len; i++) (*this).letters[i] = '0'-'0';
         return (*this);
     }
 
-    hex& hex::leftshift(const int& n){
+    hex& hex::leftshift(int n){
         for (int i = (*this).len - 1; i >= 0; i--) (*this).letters[i+n] = (*this).letters[i];
         for (int i = 0; i < n; i++) (*this).letters[i] = '0'-'0';
         return (*this);
@@ -158,7 +160,7 @@ namespace Hex {
         else {
             int temp;
             temp = a.sign, a.sign = 0, b.sign = 0;
-            a.len >= b.len ? (b.excode(a.len)):(a.excode(b.len));
+            a.len >= b.len ? (b.expanse(a.len)):(a.expanse(b.len));
             for (int i = 0; i < a.len; i++) {
                 if ((int(a.letters[i]) > int(b.letters[i])) && !temp) return 1;
                 else if ((int(a.letters[i]) < int(b.letters[i])) && !temp) return -1;
@@ -169,13 +171,14 @@ namespace Hex {
         }
     }
 
-    void hex::leadzero1() {
+    hex& hex::leadzero1() {
         int i = this->len - 1;
         while (i >= 0) {
             if (this->letters[i] == '0'-'0') i--;
             else break;
         }
         this->len = i+1;
+        return *this;
     }
     
     std::ostream& operator <<(std::ostream& c, const hex& a) { //output operator overloading
