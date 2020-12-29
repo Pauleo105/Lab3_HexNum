@@ -6,42 +6,34 @@ namespace Hex {
 
     class hex {
         private:
-            static const int SZ = 31;
             char* letters;
             int sign; // 0 - +, 1 - -
-            int type; // 0 - прямой, 1 - дополнительный
             int len;
         public:
-            hex(): sign(0), len(1), letters(new char[1]), type(0) {letters[0] = '0'-'0';};//
+            hex(): sign(0), len(1), letters(new char[1]){letters[0] = '0'-'0';};//
             hex(const char*);//
-            hex(const char*, int);//
             hex(int);//
             ~hex(){delete [] letters;}//destructor
             hex(const hex&);//copying constrictor
-            hex(hex && b): sign(b.sign), len(b.len), type(b.type), letters(b.letters) {b.letters = nullptr;}//constructor of displacement
+            hex(hex && b): sign(b.sign), len(b.len), letters(b.letters) {b.letters = nullptr;}//constructor of displacement
 
-            hex& setCh(const char*);//
-            hex& setNu(int);//
-            int getNum() const;//
-            const char* getStr() const;//
+            hex& setCh(const char*);
+            hex& setNu(int);
+            int getNum() const;
+            const char* getStr() const;
             int getLen() const {return len;}
-            hex excode(int n, bool c = false) const;//
-            hex add(const hex&) const;//
-            hex subtract(const hex&) const;//
-            hex& rightshift(int);//
-            hex& leftshift(int);//
-            int isgreat(const hex&) const;//
-            bool parity() const {return ((*this).letters[0]%2 == 0) ? true : false;};//
-            void leadzero1();//
-
+            hex excode() const; //done
+            hex& expanse(int); //done
+            int isgreat(const hex&) const;//fixed
+            bool parity() const {return (int((*this).letters[0])&1) ? false : true;}; //fixed
+            hex& leadzero1(); //fixed
+            hex& operator <<=(const int&);//fixed
+            hex& operator >>=(const int&);//fixed
             hex& operator =(hex &&);//displacement assigment operator
             hex& operator =(const hex&); //assignment operator
-            const hex operator +(const hex& b) {return (*this).add(b);}
-            const hex operator -(const hex& b) {return (*this).subtract(b);}
-            hex& operator <<=(const int&);
-            hex& operator >>=(const int&);
 
-
+        friend const hex operator +(const hex&, const hex&); //displaced from public
+        friend const hex operator -(const hex&, const hex&); //displaced from public
         friend std::ostream& operator <<(std::ostream&, const hex&);
         friend std::istream& operator >>(std::istream&, hex&);
     };

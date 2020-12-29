@@ -1,0 +1,32 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "C/C++: g++-8 build active file",
+            "command": "/usr/bin/g++-8",
+            "args": [
+                "-g",
+                "googletests.cpp",
+                "../lab3.cpp",
+                "-o",
+                "${fileDirname}/gtests",
+                "-I$/usr/src/gtest/include",
+                "-L$/usr/lib",
+                "-lgtest",
+                "-lpthread"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Generated task by Debugger"
+        }
+    ],
+    "version": "2.0.0"
+}
